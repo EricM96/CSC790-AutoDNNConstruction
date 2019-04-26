@@ -18,7 +18,7 @@ class Genome:
     def __init__(self):
         global genomeID
         self.ID = genomeID
-        self.nodes = {} # {"key" : "value"} = {"node.innovation" : node}
+        self.nodes = {} # {"key" : "value"} = {"node.innovation" : node.ID}
         self.connections = {} # {"key" : "value"} = {"connection.innovation" : connection}
         self.fitness = None
         self.species = None
@@ -150,6 +150,10 @@ class Species:
 
     def getFitnesses(self):
         return [member.fitness for member in self.members.values()]
+    
+    def displayMembers(self):
+        for member in self.members:
+            print(member)
 
 def assignInnovationNod():
     global innovationNod

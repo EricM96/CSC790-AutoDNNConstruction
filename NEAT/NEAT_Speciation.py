@@ -5,11 +5,15 @@ Created on Mon Mar 25 00:44:50 2019
 @author: NathanLHall
 """
 
+import NEAT_Classes
+
+import copy
+
 c1 = 1.0
 c2 = 1.0
 c3 = 0.4
-distanceThreshold = 3.0
 species = []
+maxNumSpeciesMembers = 10
 
 def compatibilityDistance(genome1, genome2):
     excessGenes, disjointGenes, avgWeightDifference = compareGenes(genome1, genome2)
@@ -100,17 +104,42 @@ def compareGenes(genome1, genome2):
     return excessGenes, disjointGenes, weightDifference / matchingGenes
 
 # TO-DO
-def speciate(population):
-    unspeciated = set(population)
-#    newRepresentatives = {}
-#    newMembers = {}
-    for individual in unspeciated:
+# Take in a population of unidentified species, and assign them to the proper species
+def speciate(population, generation, distanceThreshold):
+    newMembers = []
+    for individual in population:
         candidates = []
+        assigned = False
         for s in species:
             delta = compatibilityDistance(individual, s.representative)
             if  delta < distanceThreshold:
-                candidates.append((delta, individual))
+                candidates.append((delta, individual, s.ID))
+                assigned = True
 
-            dummy, newRepresentative = min(candidates, key=lambda x: x[0])
-            newRepresentatives[str(s.ID)] = newRepresentative
-            newMembers[str(s.ID)] = [newRepresentative]
+        if assigned == False:
+            newSpecies = NEAT_Classes.Species(generation)
+            newSpecies.update(individual, [individual])
+            species.append(newSpecies)
+        else:
+            candidates.sort(key=lambda tup: tup[0])
+            closestSpecies = candidates[0][2]
+            newMembers.append((closestSpecies, candidates[0][1]))
+
+    for memberTuple in newMembers:
+        species[memberTuple[0]].members[str(copy.deepcopy(memberTuple[1].ID))] = copy.deepcopy(memberTuple[1])
+
+    return species
+
+def cullSpecies(self):
+    for s in species:
+        for member1 in s.members:
+            proximities = 0
+            neighborMeasures = []
+
+            for member2 in s.members:
+                proximities += compatibilityDistance(member1, member2)
+            
+            neighborMeasures.append((proximities, member1))
+            neighborMeasures.sort(key=lambda tup: tup[0])
+
+            for i in range(maxNumSpeciesMembers)

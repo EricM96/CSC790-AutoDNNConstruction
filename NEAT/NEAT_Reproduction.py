@@ -86,12 +86,43 @@ def mutateWeights(individual):
 def expressedMutation(individual):
     connection = individual.getRandomConnection()
 
+    # Make sure turning this connection off won't fragment the network
+    safeguard = checkNumConnections(individual, connection)
+    count = 0 # If there are no possible connections to turn off, kill after a certain count
+    while safeguard == "Unsafe":
+        if count >= 10:
+            return individual
+        connection = individual.getRandomConnection()
+        safeguard = checkNumConnections(individual, connection)
+        count += 1
+
     if connection.isExpressed():
         connection.disable()
     else:
         connection.enable()
 
     return individual
+
+def checkNumConnections(individual, connection):
+    inNode = connection.getInNode()
+    outNode = connection.getOutNode()
+
+    # Check number of outgoing connections from inNode
+    inCount = 0
+    for key in individual.connections.keys():
+        if individual.connections[key].inNode == inNode and individual.connections[key].expressed == True:
+            inCount += 1
+
+    # Check number of incoming connections from outNode
+    outCount = 0
+    for key in individual.connections.keys():
+        if individual.connections[key].outNode == outNode and individual.connections[key].expressed == True:
+            outCount += 1
+
+    if inCount > 1 and outCount > 1:
+        return "Safe"
+    else:
+        return "Unsafe"
 
 def crossover(parent1, parent2):
     child = Genome()

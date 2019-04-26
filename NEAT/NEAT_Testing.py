@@ -6,7 +6,7 @@ Created on Sun Mar 24 14:41:39 2019
 """
 
 from NEAT_Classes import Genome, ConnectionGene, NodeGene
-from NEAT_Reproduction import addConnectionMutation, addNodeMutation, weightMutation, expressedMutation, crossover
+from NEAT_Reproduction import addConnection, addNode, mutateWeights, expressedMutation, crossover
 from NEAT_Speciation import compatibilityDistance
 
 import copy
@@ -51,7 +51,7 @@ def main():
         parent2.addConnectionGene(connection)
 
     parent1.setFitness(1)
-    parent2.setFitness(1)
+#    parent2.setFitness(1)
 
     # **Note on mutation stage**
     # Be mindful of the possibility that addConnection and addNode could
@@ -61,21 +61,19 @@ def main():
     # Keep a list of new node/connection genes being created each generation,
     # and use those if the mutation functions try to create a duplicate.
 
-#    parent1.displayConnectionGenes()
-#    parent2.displayConnectionGenes()
+    parent1.displayConnectionGenes()
 #    offspring = crossover(parent1, parent2)
-#    parent1 = addConnectionMutation(parent1)
-#    parent2 = addConnectionMutation(parent2)
-#    parent1 = addNodeMutation(parent1)
-#    parent2 = addNodeMutation(parent2)
-#    parent1 = weightMutation(parent1)
-#    parent2 = weightMutation(parent2)
-#    parent1 = expressedMutation(parent1)
-#    parent2 = expressedMutation(parent2)
+#    parent1 = addConnection(parent1)
+#    parent1 = addNode(parent1)
+#    parent1 = mutateWeights(parent1)
+    parent1 = expressedMutation(parent1)
+#    connection = connections1[1]
+#    result = NEAT_Reproduction.checkNumConnections(parent1, connection)
+#    print(connection.innovation)
+#    print(result)
 #    parent1.displayConnectionGenes()
-#    parent2.displayConnectionGenes()
 
-    delta = compatibilityDistance(parent1, parent2)
-    print(delta)
+#    delta = compatibilityDistance(parent1, parent2)
+#    print(delta)
     return None
 main()
