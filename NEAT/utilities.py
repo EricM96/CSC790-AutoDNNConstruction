@@ -2,6 +2,8 @@
 @Author: Eric McCullough
 """
 from NEAT_Classes import Genome, ConnectionGene, NodeGene
+from subprocess import Popen, PIPE
+import json
 
 def create_graph(solution):
     """
@@ -21,3 +23,15 @@ def create_graph(solution):
         graph[str(value.inNode)][1].append(str(value.outNode))
 
     return graph
+
+def compute_fitness(solution_graph):
+    arg1 = 'python3'
+    arg2 = '/home/eam96/Documents/CSC790-AutoDNNConstruction/Torch/fitness.py'
+    arg3 = json.dumps(solution_graph)
+    p = Popen([arg1, arg2, arg3], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    output, err = p.communicate() 
+    if err != '':
+        print("Something went wrong")
+        exit() 
+    print(output)
+    
