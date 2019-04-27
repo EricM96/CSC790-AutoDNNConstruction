@@ -9,7 +9,7 @@ sys.path.append("./")
 
 from NEAT_Classes import Genome, ConnectionGene, NodeGene
 from NEAT_Reproduction import addConnection, addNode, mutateWeights, expressedMutation, crossover
-from NEAT_Speciation import compatibilityDistance
+#from NEAT_Speciation import compatibilityDistance
 
 import copy
 
