@@ -4,6 +4,8 @@ Created on Sun Mar 24 14:41:39 2019
 
 @author: NathanLHall
 """
+import sys
+sys.path.append("./")
 
 from NEAT_Classes import Genome, ConnectionGene, NodeGene
 from NEAT_Reproduction import addConnection, addNode, mutateWeights, expressedMutation, crossover

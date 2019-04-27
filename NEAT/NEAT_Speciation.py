@@ -142,4 +142,4 @@ def cullSpecies(self):
             neighborMeasures.append((proximities, member1))
             neighborMeasures.sort(key=lambda tup: tup[0])
 
-            for i in range(maxNumSpeciesMembers)
+            #for i in range(maxNumSpeciesMembers)
