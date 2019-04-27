@@ -8,8 +8,9 @@ from NEAT_Classes import Genome, ConnectionGene, NodeGene
 from NEAT_Reproduction import addConnection, addNode, mutateWeights, expressedMutation, crossover
 #from NEAT_Speciation import compatibilityDistance
 from utilities import create_graph 
+from subprocess import Popen, PIPE
 
-import copy
+import copy, json
 
 def main():
     # Testing an example, as described in Figure 4, pg. 11, of NEAT paper
@@ -53,6 +54,16 @@ def main():
     parent1.setFitness(1)
 
     graph = create_graph(parent1)
+    arg1 = 'python3'
+    arg2 = '/home/eam96/Documents/CSC790-AutoDNNConstruction/Torch/fitness.py'
+    arg3 = json.dumps(graph)
+    p = Popen([arg1, arg2, arg3], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    output, err = p.communicate() 
+    if err != '':
+        print("Something went wrong")
+        exit() 
+    print(output)
+    
 #    parent2.setFitness(1)
 
     # **Note on mutation stage**

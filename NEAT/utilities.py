@@ -17,7 +17,7 @@ def create_graph(solution):
 
     # Iterate over connections and add them to the graph entries 
     for key, value in solution.connections.items():
-        graph[str(value.outNode)][0].append(value.inNode) 
-        graph[str(value.inNode)][1].append(value.outNode)
+        graph[str(value.outNode)][0].append(str(value.inNode)) 
+        graph[str(value.inNode)][1].append(str(value.outNode))
 
     return graph
