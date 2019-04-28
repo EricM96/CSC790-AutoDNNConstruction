@@ -192,7 +192,7 @@ class Solution(nn.Module):
 
 
 if __name__ == "__main__":
-    # graph = json.loads(sys.argv[1])
-    graph = {'1': [[], ['4']], '3': [[], ['5']], '2': [[], ['4', '5']], '5': [['3', '2', '4'], []], '4': [['1', '2'], ['5']]}
+    graph = json.loads(sys.argv[1])
+    # graph = {'1': [[], ['4']], '3': [[], ['5']], '2': [[], ['4', '5']], '5': [['3', '2', '4'], []], '4': [['1', '2'], ['5']]}
     model = Solution(graph)
     model.feed_forward(np.random.rand(1, 3))
