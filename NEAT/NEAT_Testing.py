@@ -52,8 +52,8 @@ def main():
 
     parent1.setFitness(1)
 
-    solution_graph = create_graph(parent1)
-    compute_fitness(solution_graph)
+    fitness = compute_fitness(parent1)
+    print(fitness)
 
 #    parent2.setFitness(1)
 

@@ -24,7 +24,9 @@ def create_graph(solution):
 
     return graph
 
-def compute_fitness(solution_graph):
+def compute_fitness(solution):
+    solution_graph = create_graph(solution)
+
     # create shell command
     arg1 = 'python3'
     arg2 = '/home/eam96/Documents/CSC790-AutoDNNConstruction/NEAT/fitness.py'
@@ -35,7 +37,7 @@ def compute_fitness(solution_graph):
     if err != b'':
         print("Something went wrong")
         print(err)
-        exit() 
+        return -1.
 
-    print(output)
+    return float(output)
     

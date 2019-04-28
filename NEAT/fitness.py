@@ -86,9 +86,9 @@ class Solution(nn.Module):
         self._populate_inputs(X)
         self._step_inputs()
         self._step_hiddens()
-        self._display_activation_graph()
-        output = self._step_outputs() 
-        print(torch.argmax(output))
+        output = self._step_outputs()
+
+        return np.int(torch.argmax(output))
 
     def _populate_inputs(self, X):
         """
@@ -136,7 +136,6 @@ class Solution(nn.Module):
 
         hidden_keys = [key for key, val in self.activation_graph.items() if val['node type'] == 'hidden']
         visited_nodes = [key for key, val in self.activation_graph.items() if val['node type'] == 'input']
-        print(hidden_keys)
 
         for node in hidden_keys:
             if set(self.activation_graph[node]['dependencies']) <= set(visited_nodes):
@@ -195,4 +194,4 @@ if __name__ == "__main__":
     graph = json.loads(sys.argv[1])
     # graph = {'1': [[], ['4']], '3': [[], ['5']], '2': [[], ['4', '5']], '5': [['3', '2', '4'], []], '4': [['1', '2'], ['5']]}
     model = Solution(graph)
-    model.feed_forward(np.random.rand(1, 3))
+    print(model.feed_forward(np.random.rand(1, 3)))
