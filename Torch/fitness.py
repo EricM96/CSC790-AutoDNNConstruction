@@ -24,6 +24,7 @@ class Solution(nn.Module):
         @params: a graph representation of a neural network
         @returns: a nn.Module for the graph 
         """
+        
         in_nodes = [key for key, value in graph.items() if len(value[0]) == 0]
         out_nodes = [key for key, value in graph.items() if len(value[1]) == 0]
         hidden_nodes = [key for key, value in graph.items() if len(value[0]) != 0 and len(value[1]) != 0]
@@ -42,6 +43,17 @@ class Solution(nn.Module):
         return moduleDict
 
     def populate_activation_graph(self, graph):
+        """
+        @params: a graph representation of a neural network
+        @return: an activation graph, in the following format: 
+        {node id: {
+            input tensor: the input the node will work on
+            node type: input or output or hidden
+            dependencies: nodes that must execute before the current node can run
+            }
+        }
+        """
+
         activation_graph = {}
 
         for key in graph.keys():
@@ -64,12 +76,23 @@ class Solution(nn.Module):
         return activation_graph
 
     def feed_forward(self, X):
+        """
+        @params: network input
+        @return: network prediction 
+        """
+
         print(self.activation_graph)
         print()
         self._populate_inputs(X)
         print(self.activation_graph)
 
     def _populate_inputs(self, X):
+        """
+        @params: an input tensor for the network
+        @return: the activation graph with a single value from the network input 
+                 placed into each of input tensors for the input nodes 
+        """
+
         i = 0
         for key, value in self.activation_graph.items():
             if value['node type'] == 'input':
