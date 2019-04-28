@@ -25,9 +25,11 @@ def create_graph(solution):
     return graph
 
 def compute_fitness(solution_graph):
+    # create shell command
     arg1 = 'python3'
     arg2 = '/home/eam96/Documents/CSC790-AutoDNNConstruction/Torch/fitness.py'
     arg3 = json.dumps(solution_graph)
+    # run shell command
     p = Popen([arg1, arg2, arg3], stdout=PIPE, stdin=PIPE, stderr=PIPE)
     output, err = p.communicate() 
     if err != '':
