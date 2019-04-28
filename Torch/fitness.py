@@ -109,11 +109,12 @@ class Solution(nn.Module):
         @return: runs the network feature associated with each input node and 
                  adds the output to the input tensor for node that depends on it
         """
+
         for key, value in self.activation_graph.items():
             if value['node type'] == 'input':
-                #x = self.features[key](torch.DoubleTensor(value['input tensor']))
                 t = torch.tensor(value['input tensor'])
                 y_hat = self.features[key](t)
+
                 for val, out_node in zip(y_hat, value['output nodes']):
                     i = 0
                     while True:
@@ -122,9 +123,36 @@ class Solution(nn.Module):
                             break
                         else:
                             i += 1
+
     def _step_hiddens(self):
-        pass
-        
+        """
+        @description: a helper function for feed_forward
+        @params: none
+        @return: runs the network feature associated with each hidden node and 
+                 adds the output to the input tensor for its dependants 
+        """
+
+        hidden_keys = [key for key, val in self.activation_graph.items() if val['node type'] == 'hidden']
+        visited_nodes = [key for key, val in self.activation_graph.items() if val['node type'] == 'input']
+        print(hidden_keys)
+
+        for node in hidden_keys:
+            if set(self.activation_graph[node]['dependencies']) <= set(visited_nodes):
+                t = torch.tensor(self.activation_graph[node]['input tensor'])
+                y_hat = self.features[node](t)
+
+                for val, out_node in zip(y_hat, self.activation_graph[node]['output nodes']):
+                    i = 0
+                    while True:
+                        if self.activation_graph[out_node]['input tensor'][i] == 0.:
+                            self.activation_graph[out_node]['input tensor'][i] = np.float64(val)
+                            break
+                        else:
+                            i += 1
+
+            else:
+                hidden_keys.append(node)
+                
     def _display_activation_graph(self):
         for key, value in self.activation_graph.items():
             print(key, value) 
