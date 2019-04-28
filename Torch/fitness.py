@@ -24,7 +24,7 @@ class Solution(nn.Module):
         @params: a graph representation of a neural network
         @returns: a nn.Module for the graph 
         """
-        
+
         in_nodes = [key for key, value in graph.items() if len(value[0]) == 0]
         out_nodes = [key for key, value in graph.items() if len(value[1]) == 0]
         hidden_nodes = [key for key, value in graph.items() if len(value[0]) != 0 and len(value[1]) != 0]
@@ -81,10 +81,9 @@ class Solution(nn.Module):
         @return: network prediction 
         """
 
-        print(self.activation_graph)
-        print()
+        self._display_activation_graph()
         self._populate_inputs(X)
-        print(self.activation_graph)
+        self._display_activation_graph()
 
     def _populate_inputs(self, X):
         """
@@ -98,6 +97,12 @@ class Solution(nn.Module):
             if value['node type'] == 'input':
                 self.activation_graph[key]['input tensor'][0] = X[0][i]
                 i += 1
+
+    def _display_activation_graph(self):
+        for key, value in self.activation_graph.items():
+            print(key, value) 
+
+        print()
         
 
 
