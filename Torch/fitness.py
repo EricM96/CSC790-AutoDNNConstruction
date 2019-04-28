@@ -12,6 +12,7 @@ class Solution(nn.Module):
     def __init__(self, moduleDict):
         super(Solution, self).__init__()
         self.features = moduleDict
+        self.activation = nn.ReLU() 
 
 def id_features(graph):
     """
