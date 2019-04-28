@@ -87,6 +87,8 @@ class Solution(nn.Module):
         self._step_inputs()
         self._step_hiddens()
         self._display_activation_graph()
+        output = self._step_outputs() 
+        print(torch.argmax(output))
 
     def _populate_inputs(self, X):
         """
@@ -152,7 +154,33 @@ class Solution(nn.Module):
 
             else:
                 hidden_keys.append(node)
-                
+
+    def _step_outputs(self):
+        """
+        @description: a helper function for feed_forward
+        @params: none
+        @return: runs the network features for each output node and aggregates
+                 the output for each into a single tensor  
+        """
+
+        iterator_counter = 0
+        output = None
+        for key, value in self.activation_graph.items():
+            if value['node type'] == 'output':
+                t = torch.tensor(value['input tensor'])
+                y_hat = self.features[key](t)
+
+                if iterator_counter == 0:
+                    output = y_hat
+
+                else:
+                    output = torch.cat((output, y_hat), 1)
+
+                iterator_counter += 1
+
+        return output
+
+
     def _display_activation_graph(self):
         for key, value in self.activation_graph.items():
             print(key, value) 
