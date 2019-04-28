@@ -6,16 +6,18 @@
 """
 import sys, json
 import numpy as np
-from torch import tensor
+import torch
 import torch.nn as nn
 import torch.nn.functional as F 
+
+torch.set_default_tensor_type('torch.DoubleTensor')
 
 class Solution(nn.Module):
     def __init__(self, graph):
         super(Solution, self).__init__()
 
         self.features = self._create_model(graph)
-        self.activation = nn.ReLU() 
+        self.activation = F.relu
 
         self.activation_graph = self.populate_activation_graph(graph)
 
@@ -81,12 +83,14 @@ class Solution(nn.Module):
         @return: network prediction 
         """
 
-        self._display_activation_graph()
         self._populate_inputs(X)
+        self._step_inputs()
+        self._step_hiddens()
         self._display_activation_graph()
 
     def _populate_inputs(self, X):
         """
+        @description: a helper function for feed_forward
         @params: an input tensor for the network
         @return: the activation graph with a single value from the network input 
                  placed into each of input tensors for the input nodes 
@@ -98,6 +102,29 @@ class Solution(nn.Module):
                 self.activation_graph[key]['input tensor'][0] = X[0][i]
                 i += 1
 
+    def _step_inputs(self):
+        """
+        @description: a helper function for feed_forward
+        @params: none
+        @return: runs the network feature associated with each input node and 
+                 adds the output to the input tensor for node that depends on it
+        """
+        for key, value in self.activation_graph.items():
+            if value['node type'] == 'input':
+                #x = self.features[key](torch.DoubleTensor(value['input tensor']))
+                t = torch.tensor(value['input tensor'])
+                y_hat = self.features[key](t)
+                for val, out_node in zip(y_hat, value['output nodes']):
+                    i = 0
+                    while True:
+                        if self.activation_graph[out_node]['input tensor'][i] == 0.:
+                            self.activation_graph[out_node]['input tensor'][i] = np.float64(val)
+                            break
+                        else:
+                            i += 1
+    def _step_hiddens(self):
+        pass
+        
     def _display_activation_graph(self):
         for key, value in self.activation_graph.items():
             print(key, value) 
@@ -111,6 +138,5 @@ class Solution(nn.Module):
 if __name__ == "__main__":
     # graph = json.loads(sys.argv[1])
     graph = {'1': [[], ['4']], '3': [[], ['5']], '2': [[], ['4', '5']], '5': [['3', '2', '4'], []], '4': [['1', '2'], ['5']]}
-    print(graph) 
     model = Solution(graph)
     model.feed_forward(np.random.rand(1, 3))
