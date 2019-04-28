@@ -2,6 +2,11 @@ import sys, json
 import torch.nn as nn
 import torch.nn.functional as F 
 
+class Solution(nn.Module):
+    def __init__(self, moduleDict):
+        super(Solution, self).__init__()
+        self.features = moduleDict
+
 def id_features(graph):
     in_nodes = [key for key, value in graph.items() if len(value[0]) == 0]
     out_nodes = [key for key, value in graph.items() if len(value[1]) == 0]
@@ -11,7 +16,7 @@ def id_features(graph):
     print("Hidden nodes", hidden_nodes)
     print("out_nodes", out_nodes)
 
-    moduleDict = {} 
+    moduleDict = nn.ModuleDict({}) 
 
     for node in in_nodes:
         moduleDict[node] = nn.Linear(1, len(graph[node][1]))
@@ -22,7 +27,8 @@ def id_features(graph):
     for node in out_nodes:
         moduleDict[node] = nn.Linear(len(graph[node][0]), 1)
 
-    print(moduleDict) 
+    solution = Solution(moduleDict) 
+    print(solution)
 
 if __name__ == "__main__":
     graph = json.loads(sys.argv[1])
