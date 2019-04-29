@@ -25,7 +25,7 @@ def initializePop(numInputs, numOutputs, popSize):
     connections = []
     for inNode in inputs:
         for outNode in outputs:
-            connections.append(NEAT_Classes.ConnectionGene(inNode.getID(), outNode.getID(), 1, True))
+            connections.append(NEAT_Classes.ConnectionGene(inNode.ID, inNode.innovation, outNode.ID, outNode.innovation, 1, True))
 
     population = []
     for _ in range(popSize):
