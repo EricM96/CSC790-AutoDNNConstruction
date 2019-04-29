@@ -34,7 +34,7 @@ def compute_fitness(solution):
     # run shell command
     p = Popen([arg1, arg2, arg3], stdout=PIPE, stdin=PIPE, stderr=PIPE)
     output, err = p.communicate() 
-    if err != b'':
+    if len(err) != 0:
         print("Something went wrong")
         print(err)
         return -1.
