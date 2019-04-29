@@ -4,6 +4,7 @@
               by the GA code, creates a PyTorch neural network from those features
               and determines fitness by running it on training and validation data
 """
+
 import sys, json
 import numpy as np
 import torch
@@ -19,7 +20,20 @@ class Solution(nn.Module):
         self.features = self._create_model(graph)
         self.activation = F.relu
 
-        self.activation_graph = self.populate_activation_graph(graph)
+        self.activation_graph = self._populate_activation_graph(graph)
+
+    def feed_forward(self, X):
+        """
+        @params: network input
+        @return: network prediction 
+        """
+
+        self._populate_inputs(X)
+        self._step_inputs()
+        self._step_hiddens()
+        output = self._step_outputs()
+
+        return np.int(torch.argmax(output))
 
     def _create_model(self, graph):
         """
@@ -44,7 +58,7 @@ class Solution(nn.Module):
 
         return moduleDict
 
-    def populate_activation_graph(self, graph):
+    def _populate_activation_graph(self, graph):
         """
         @params: a graph representation of a neural network
         @return: an activation graph, in the following format: 
@@ -76,19 +90,6 @@ class Solution(nn.Module):
                 'dependencies': graph[key][0]}
 
         return activation_graph
-
-    def feed_forward(self, X):
-        """
-        @params: network input
-        @return: network prediction 
-        """
-
-        self._populate_inputs(X)
-        self._step_inputs()
-        self._step_hiddens()
-        output = self._step_outputs()
-
-        return np.int(torch.argmax(output))
 
     def _populate_inputs(self, X):
         """
@@ -187,11 +188,7 @@ class Solution(nn.Module):
         print()
         
 
-
-
-
 if __name__ == "__main__":
     graph = json.loads(sys.argv[1])
-    # graph = {'1': [[], ['4']], '3': [[], ['5']], '2': [[], ['4', '5']], '5': [['3', '2', '4'], []], '4': [['1', '2'], ['5']]}
     model = Solution(graph)
     print(model.feed_forward(np.random.rand(1, 3)))
