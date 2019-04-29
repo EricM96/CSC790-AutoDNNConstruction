@@ -3,7 +3,7 @@
 """
 from NEAT_Classes import Genome, ConnectionGene, NodeGene
 from subprocess import Popen, PIPE
-import json
+import json, sys
 
 def create_graph(solution):
     """
@@ -28,7 +28,7 @@ def compute_fitness(solution):
     solution_graph = create_graph(solution)
 
     # create shell command
-    arg1 = 'python3'
+    arg1 = sys.executable
     arg2 = '/home/eam96/Documents/CSC790-AutoDNNConstruction/NEAT/fitness.py'
     arg3 = json.dumps(solution_graph)
     # run shell command
