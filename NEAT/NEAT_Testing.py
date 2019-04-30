@@ -4,10 +4,10 @@ Created on Sun Mar 24 14:41:39 2019
 
 @author: NathanLHall
 """
-
 from NEAT_Classes import Genome, ConnectionGene, NodeGene
 from NEAT_Reproduction import addConnection, addNode, mutateWeights, expressedMutation, crossover
-from NEAT_Speciation import compatibilityDistance
+#from NEAT_Speciation import compatibilityDistance
+from utilities import create_graph, compute_fitness
 
 import copy
 import utilities
@@ -53,8 +53,10 @@ def main():
     for connection in connections2:
         parent2.addConnectionGene(connection)
 
-    test = utilities.compute_fitness(parent1)
-    print(test)
+
+
+    fitness = compute_fitness(parent1)
+    print(fitness)
 
     # parent1.setFitness(1)
 #    parent2.setFitness(1)
@@ -67,7 +69,11 @@ def main():
     # Keep a list of new node/connection genes being created each generation,
     # and use those if the mutation functions try to create a duplicate.
 
+
+    #parent1.displayConnectionGenes()
+
     # parent1.displayConnectionGenes()
+
 #    offspring = crossover(parent1, parent2)
 #    parent1 = addConnection(parent1)
 #    parent1 = addNode(parent1)
