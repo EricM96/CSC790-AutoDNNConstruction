@@ -16,9 +16,9 @@ def addConnection(individual):
     weight = random.randrange(-2, 2)
 
     # Avoid connecting nodes:
-    #  - in the same input/output layer
-    #  - that are the same
-    while (node1.getType() == node2.getType() and node1.getType() != "HIDDEN") or node1.getInnovation() == node2.getInnovation():
+    #  1.  Input to input / output to output
+    #  2.  To itself
+    while (node1.getType() == node2.getType() and node1.getType() != "HIDDEN") or node1.ID == node2.ID:
         node1 = individual.getRandomNode()
         node2 = individual.getRandomNode()
 
@@ -137,7 +137,7 @@ def crossover(parent1, parent2):
         secondary = parent1
 
     # Inherit all nodes from primary parent
-    for node in primary.getNodeGenes().values():
+    for node in primary.getNodeGenes():
         child.addNodeGene(node)
 
     # Inherit connections
@@ -153,8 +153,12 @@ def crossover(parent1, parent2):
 
     # If both parents are of equal fitness, inherit all disjoint/excess genes
     if fullInheritance:
-        for node in secondary.getNodeGenes().values():
-            if str(node.getInnovation()) not in child.getNodeGenes().keys():
+        IDs = []
+        for node in child.getNodeGenes():
+            IDs.append(node.ID)
+
+        for node in secondary.getNodeGenes():
+            if node.ID not in IDs:
                 child.addNodeGene(node)
 
         for connection in secondary.getConnectionGenes().values():

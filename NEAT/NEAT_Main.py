@@ -14,8 +14,8 @@ import random
 
 numInputs = 3
 numOutputs = 1
-popSize = 20
-maxGenerations = 21
+popSize = 10
+maxGenerations = 15
 distanceThreshold = 3.0
 
 def initializePop(numInputs, numOutputs, popSize):
@@ -25,7 +25,7 @@ def initializePop(numInputs, numOutputs, popSize):
     connections = []
     for inNode in inputs:
         for outNode in outputs:
-            connections.append(NEAT_Classes.ConnectionGene(inNode.ID, inNode.innovation, outNode.ID, outNode.innovation, 1, True))
+            connections.append(NEAT_Classes.ConnectionGene(inNode.ID, outNode.ID, 1, True))
 
     population = []
     for _ in range(popSize):
@@ -71,7 +71,7 @@ def main():
             offspring = NEAT_Reproduction.expressedMutation(offspring)
             offsprings.append(offspring)
         # Measure offsprings fitnesses
-        NEAT_Speciation.species = NEAT_Speciation.speciate(offsprings, generation, distanceThreshold)
+        # NEAT_Speciation.species = NEAT_Speciation.speciate(offsprings, generation, distanceThreshold)
     #     print("Generation:", generation)
     # print(len(species))
         # Update species representative (most fit? center most?)

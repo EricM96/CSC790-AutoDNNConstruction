@@ -10,7 +10,7 @@ from NEAT_Reproduction import addConnection, addNode, mutateWeights, expressedMu
 from NEAT_Speciation import compatibilityDistance
 
 import copy
-import utilities
+# import utilities
 from subprocess import Popen, PIPE
 import json
 
@@ -25,14 +25,14 @@ def main():
     nodes1 = [node1, node2, node3, node4, node5]
     nodes2 = [node1, node2, node3, node4, node5, node6]
 
-    connection1 = ConnectionGene(node1.ID, node1.ID, node4.ID, node4.ID, 1, True)
-    connection2 = ConnectionGene(node2.ID, node2.ID, node4.ID, node4.ID, 1, True)
-    connection3 = ConnectionGene(node3.ID, node3.ID, node4.ID, node4.ID, 1, True)
-    connection4 = ConnectionGene(node2.ID, node2.ID, node5.ID, node5.ID, 1, False)
-    connection5 = ConnectionGene(node3.ID, node3.ID, node5.ID, node5.ID, 1, True)
-    connection6 = ConnectionGene(node4.ID, node4.ID, node5.ID, node5.ID, 1, True)
-    connection7 = ConnectionGene(node1.ID, node1.ID, node6.ID, node6.ID, 1, True)
-    connection8 = ConnectionGene(node6.ID, node6.ID, node4.ID, node4.ID, 1, True)
+    connection1 = ConnectionGene(node1.ID, node4.ID, 1, True)
+    connection2 = ConnectionGene(node2.ID, node4.ID, 1, True)
+    connection3 = ConnectionGene(node3.ID, node4.ID, 1, True)
+    connection4 = ConnectionGene(node2.ID, node5.ID, 1, False)
+    connection5 = ConnectionGene(node3.ID, node5.ID, 1, True)
+    connection6 = ConnectionGene(node4.ID, node5.ID, 1, True)
+    connection7 = ConnectionGene(node1.ID, node6.ID, 1, True)
+    connection8 = ConnectionGene(node6.ID, node4.ID, 1, True)
     connections1 = [connection1, connection2, connection4, connection5, connection6]
 
     parent1 = Genome()
@@ -53,8 +53,8 @@ def main():
     for connection in connections2:
         parent2.addConnectionGene(connection)
 
-    test = utilities.compute_fitness(parent1)
-    print(test)
+    # test = utilities.compute_fitness(parent1)
+    # print(test)
 
     # parent1.setFitness(1)
 #    parent2.setFitness(1)

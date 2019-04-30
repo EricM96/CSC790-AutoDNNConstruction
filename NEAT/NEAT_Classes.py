@@ -9,7 +9,6 @@ import copy
 import random
 
 genomeID = 1
-innovationNod = 0
 innovationCon = 0
 speciesID = 0
 
@@ -18,27 +17,27 @@ class Genome:
     def __init__(self):
         global genomeID
         self.ID = genomeID
-        self.nodes = {} # {"key" : "value"} = {"node.innovation" : node.ID}
+        self.nodes = []
         self.connections = {} # {"key" : "value"} = {"connection.innovation" : connection}
         self.fitness = None
         self.species = None
         genomeID += 1
 
     def addNodeGene(self, node):
-        self.nodes[str(copy.deepcopy(node.getInnovation()))] = copy.deepcopy(node)
+        self.nodes.append(copy.deepcopy(node))
+        self.nodes.sort(key=lambda n: n.ID)
 
     def getNodeGenes(self):
         return self.nodes
 
     def getRandomNode(self):
-        key = str(random.sample(self.getNodeGenes().keys(), 1)[0])
-        return self.getNodeGenes()[key]
+        return random.choice(self.getNodeGenes())
 
     def getNextNodeID(self):
         maxID = 0
-        for node in self.getNodeGenes().values():
-            if node.getID() > maxID:
-                maxID = node.getID()
+        for node in self.getNodeGenes():
+            if node.ID > maxID:
+                maxID = node.ID
         return maxID + 1
 
     def addConnectionGene(self, connection):
@@ -63,11 +62,11 @@ class Genome:
         print("FITNESS:", self.getFitness())
         print()
         print("NODE GENES:")
-        for innovNum in sorted(self.getNodeGenes().keys(), key=lambda s: int(s)):
-            node = self.nodes[str(innovNum)]
-            if int(innovNum) < 10:
-                innovNum = " " + innovNum
-            print(" ", innovNum, "|", "Node", node.getID(), "|", node.getType())
+        for node in sorted(self.getNodeGenes().sort(key=self.ID)):
+            idNum = str(node.ID)
+            if node.ID < 10:
+                idNum = " " + idNum
+            print(" ", idNum, "|", "Node", node.ID, "|", node.getType())
         print()
 
         print("CONNECTION GENES:")
@@ -86,11 +85,9 @@ class Genome:
         return None
 
 class ConnectionGene:
-    def __init__(self, inNode, inNodeInnov, outNode, outNodeInnov, weight, expressed):
+    def __init__(self, inNode, outNode, weight, expressed):
         self.inNode = int(inNode)
-        self.inNodeInnov = int(inNodeInnov)
         self.outNode = int(outNode)
-        self.outNodeInnov = int(outNodeInnov)
         self.weight = float(weight)
         self.expressed = bool(expressed)
         self.innovation = int(assignInnovationCon())
@@ -123,16 +120,12 @@ class NodeGene:
     def __init__(self, Type, ID):
         self.Type = str(Type)
         self.ID = int(ID)
-        self.innovation = int(assignInnovationNod())
 
     def getType(self):
         return self.Type
 
     def getID(self):
         return self.ID
-
-    def getInnovation(self):
-        return self.innovation
 
 class Species:
     def __init__(self, generation):
@@ -156,11 +149,6 @@ class Species:
     def displayMembers(self):
         for member in self.members:
             print(member)
-
-def assignInnovationNod():
-    global innovationNod
-    innovationNod += 1
-    return innovationNod
 
 def assignInnovationCon():
     global innovationCon

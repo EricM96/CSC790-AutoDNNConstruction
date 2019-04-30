@@ -40,34 +40,42 @@ def compareGenes(genome1, genome2):
     disjointGenes = 0
     weightDifference = 0.0
 
-    maxNodeInnov1 = int(max(genome1.getNodeGenes().keys()))
-    maxNodeInnov2 = int(max(genome2.getNodeGenes().keys()))
+    nodes1 = genome1.getNodeGenes()
+    nodes2 = genome2.getNodeGenes()
+    maxNodeID1 = max(node.ID for node in nodes1)
+    maxNodeID2 = max(node.ID for node in nodes2)
+    maxNodeID = max([maxNodeID1, maxNodeID2])
 
-    if maxNodeInnov1 >= maxNodeInnov2:
-        maxNodeInnov = maxNodeInnov1
-    else:
-        maxNodeInnov = maxNodeInnov2
+    nodeIDs = []
+    for node in nodes1:
+        if node.ID not in nodeIDs:
+            nodeIDs.append(node.ID)
+    for node in nodes2:
+        if node.ID not in nodeIDs:
+            nodeIDs.append(node.ID)
 
-    for i in range(0, maxNodeInnov + 1):
+    for i in nodeIDs:
         node1 = None
         node2 = None
-
-        if str(i) in genome1.getNodeGenes().keys():
-            node1 = genome1.getNodeGenes()[str(i)]
-        if str(i) in genome2.getNodeGenes().keys():
-            node2 = genome2.getNodeGenes()[str(i)]
+        
+        for node in nodes1:
+            if i == node.ID:
+                node1 = node
+        for node in nodes2:
+            if i == node.ID:
+                node2 = node
 
         if node1 != None and node2 != None:
             matchingGenes += 1
 
-        elif node1 == None and maxNodeInnov1 < i and node2 != None:
+        elif node1 == None and maxNodeID1 < i and node2 != None:
             excessGenes += 1
-        elif node1 != None and maxNodeInnov2 < i and node2 == None:
+        elif node1 != None and maxNodeID2 < i and node2 == None:
             excessGenes += 1
 
-        elif node1 == None and maxNodeInnov1 > i and node2 != None:
+        elif node1 == None and maxNodeID1 > i and node2 != None:
             disjointGenes += 1
-        elif node1 != None and maxNodeInnov2 > i and node2 == None:
+        elif node1 != None and maxNodeID2 > i and node2 == None:
             disjointGenes += 1
 
     maxConnectionInnov1 = int(max(genome1.getConnectionGenes().keys()))
@@ -130,16 +138,16 @@ def speciate(population, generation, distanceThreshold):
 
     return species
 
-def cullSpecies(self):
-    for s in species:
-        for member1 in s.members:
-            proximities = 0
-            neighborMeasures = []
+# def cullSpecies(self):
+#     for s in species:
+#         for member1 in s.members:
+#             proximities = 0
+#             neighborMeasures = []
 
-            for member2 in s.members:
-                proximities += compatibilityDistance(member1, member2)
+#             for member2 in s.members:
+#                 proximities += compatibilityDistance(member1, member2)
             
-            neighborMeasures.append((proximities, member1))
-            neighborMeasures.sort(key=lambda tup: tup[0])
+#             neighborMeasures.append((proximities, member1))
+#             neighborMeasures.sort(key=lambda tup: tup[0])
 
-            for i in range(maxNumSpeciesMembers)
+#             for i in range(maxNumSpeciesMembers)
