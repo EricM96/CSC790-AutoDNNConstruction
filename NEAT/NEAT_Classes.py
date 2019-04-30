@@ -18,7 +18,7 @@ class Genome:
     def __init__(self):
         global genomeID
         self.ID = genomeID
-        self.nodes = {} # {"key" : "value"} = {"node.innovation" : node.ID}
+        self.nodes = {} # {"key" : "value"} = {"node.innovation" : node}
         self.connections = {} # {"key" : "value"} = {"connection.innovation" : connection}
         self.fitness = None
         self.species = None
