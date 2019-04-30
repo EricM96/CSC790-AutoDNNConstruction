@@ -113,7 +113,7 @@ def compareGenes(genome1, genome2):
 
 # TO-DO
 # Take in a population of unidentified species, and assign them to the proper species
-def speciate(population, generation, distanceThreshold):
+def speciate(population, generation, distanceThreshold, species):
     newMembers = []
     for individual in population:
         candidates = []
@@ -121,33 +121,56 @@ def speciate(population, generation, distanceThreshold):
         for s in species:
             delta = compatibilityDistance(individual, s.representative)
             if  delta < distanceThreshold:
-                candidates.append((delta, individual, s.ID))
+                candidates.append((delta, s.ID))
                 assigned = True
 
         if assigned == False:
             newSpecies = NEAT_Classes.Species(generation)
             newSpecies.update(individual, [individual])
             species.append(newSpecies)
-        else:
-            candidates.sort(key=lambda tup: tup[0])
-            closestSpecies = candidates[0][2]
-            newMembers.append((closestSpecies, candidates[0][1]))
+            continue
+
+        candidates.sort(key=lambda tup: tup[0])
+        closestSpecies = candidates[0][1]
+        newMembers.append((closestSpecies, individual))
 
     for memberTuple in newMembers:
-        species[memberTuple[0]].members[str(copy.deepcopy(memberTuple[1].ID))] = copy.deepcopy(memberTuple[1])
+        # Update the individual's species ID
+        memberTuple[1].species = memberTuple[0]
+        # Add individual to species members
+        species[memberTuple[0]].members[str(memberTuple[1].ID)] = copy.deepcopy(memberTuple[1])
 
     return species
 
-# def cullSpecies(self):
-#     for s in species:
-#         for member1 in s.members:
-#             proximities = 0
-#             neighborMeasures = []
+def cullSpecies(species, maxPopSize):
+    totalMembers = 0
+    for s in species:
+        totalMembers += len(s.members)
 
-#             for member2 in s.members:
-#                 proximities += compatibilityDistance(member1, member2)
+    while totalMembers > maxPopSize:
+        largest = 0
+        index = 0
+        for i in range(len(species)):
+            if len(species[i].members) > largest:
+                largest = len(species[i].members)
+                index = i
+
+        neighborMeasures = []
+        for member1 in species[index].members.values():
+            proximities = 0
+
+            for member2 in species[index].members.values():
+                proximities += compatibilityDistance(member1, member2)
             
-#             neighborMeasures.append((proximities, member1))
-#             neighborMeasures.sort(key=lambda tup: tup[0])
+            neighborMeasures.append((proximities, member1))
 
-#             for i in range(maxNumSpeciesMembers)
+        neighborMeasures.sort(key=lambda tup: tup[0], reverse=True)
+
+        furthestMemberID = neighborMeasures[0][1].ID
+        species[index].members.pop(str(furthestMemberID))
+
+        totalMembers = 0
+        for s in species:
+            totalMembers += len(s.members)
+
+    return species
