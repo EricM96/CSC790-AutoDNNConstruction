@@ -24,12 +24,14 @@ class Solution(nn.Module):
 
     def feed_forward(self, X):
         """
-        @params: network input
+        @params: network input ( a 1xinput_size numpy array )
         @return: network prediction 
         """
-
+        # self._display_activation_graph()
         self._populate_inputs(X)
+        # self._display_activation_graph()
         self._step_inputs()
+        # self._display_activation_graph()
         self._step_hiddens()
         output = self._step_outputs()
 
@@ -190,5 +192,6 @@ class Solution(nn.Module):
 
 if __name__ == "__main__":
     graph = json.loads(sys.argv[1])
+    #graph = {'1': ([], ['4']), '2': ([], ['4']), '3': ([], ['5']), '4': (['1', '2'], ['5']), '5': (['3', '4'], [])}
     model = Solution(graph)
     print(model.feed_forward(np.random.rand(1, 3)))
