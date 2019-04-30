@@ -12,12 +12,6 @@ import NEAT_Speciation
 # import numpy as np
 import random
 
-numInputs = 3
-numOutputs = 1
-popSize = 10
-maxGenerations = 15
-distanceThreshold = 3.0
-
 def initializePop(numInputs, numOutputs, popSize):
     inputs = [NEAT_Classes.NodeGene("INPUT", n) for n in range(1, numInputs + 1)]
     outputs = [NEAT_Classes.NodeGene("OUTPUT", n) for n in range(numInputs + 1, numInputs + numOutputs + 1)]
@@ -45,15 +39,16 @@ def initializePop(numInputs, numOutputs, popSize):
     newSpecies = NEAT_Classes.Species(generation)
     newSpecies.update(population[0], population)
     
-    NEAT_Speciation.species.append(newSpecies)
+    species = NEAT_Speciation.species
+    species.append(newSpecies)
     # NEAT_Classes.genomeID = 1
     # NEAT_Classes.innovationNod = 0
     # NEAT_Classes.innovationCon = 0
     # NEAT_Classes.speciesID = 0
 
-    return population, NEAT_Speciation.species
+    return population, species
 
-def main():
+def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
     population, species = initializePop(numInputs, numOutputs, popSize)
     # ? Measure fitness
     for generation in range(1, maxGenerations):
@@ -67,11 +62,13 @@ def main():
             offspring = NEAT_Reproduction.crossover(parent1, parent2)
             offspring = NEAT_Reproduction.addConnection(offspring)
             offspring = NEAT_Reproduction.addNode(offspring)
-            offspring = NEAT_Reproduction.mutateWeights(offspring)
+            # offspring = NEAT_Reproduction.mutateWeights(offspring)
             offspring = NEAT_Reproduction.expressedMutation(offspring)
             offsprings.append(offspring)
+
         # Measure offsprings fitnesses
-        # NEAT_Speciation.species = NEAT_Speciation.speciate(offsprings, generation, distanceThreshold)
+        species = NEAT_Speciation.speciate(offsprings, generation, distanceThreshold, species)
+        species = NEAT_Speciation.cullSpecies(species, popSize)
     #     print("Generation:", generation)
     # print(len(species))
         # Update species representative (most fit? center most?)
@@ -82,5 +79,11 @@ def main():
     # for offspring in offsprings:
     #     offspring.displayConnectionGenes()
     #print(len(offsprings))
-            
-main()
+
+if __name__ == "__main__":
+    numInputs = 3
+    numOutputs = 1
+    popSize = 10
+    maxGens = 10
+    distanceThreshold = 3.0
+    main(numInputs, numOutputs, popSize, maxGens, distanceThreshold)
