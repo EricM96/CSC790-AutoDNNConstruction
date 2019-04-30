@@ -86,9 +86,11 @@ class Genome:
         return None
 
 class ConnectionGene:
-    def __init__(self, inNode, outNode, weight, expressed):
+    def __init__(self, inNode, inNodeInnov, outNode, outNodeInnov, weight, expressed):
         self.inNode = int(inNode)
+        self.inNodeInnov = int(inNodeInnov)
         self.outNode = int(outNode)
+        self.outNodeInnov = int(outNodeInnov)
         self.weight = float(weight)
         self.expressed = bool(expressed)
         self.innovation = int(assignInnovationCon())
