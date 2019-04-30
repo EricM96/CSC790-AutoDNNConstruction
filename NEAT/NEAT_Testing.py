@@ -70,7 +70,7 @@ def main():
 #    parent1 = addConnection(parent1)
 #    parent1 = addNode(parent1)
 #    parent1 = mutateWeights(parent1)
-    parent1 = expressedMutation(parent1)
+#    parent1 = expressedMutation(parent1)
 #    connection = connections1[1]
 #    result = NEAT_Reproduction.checkNumConnections(parent1, connection)
 #    print(connection.innovation)
