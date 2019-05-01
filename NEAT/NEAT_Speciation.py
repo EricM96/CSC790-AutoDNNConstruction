@@ -111,34 +111,35 @@ def compareGenes(genome1, genome2):
 
     return excessGenes, disjointGenes, weightDifference / matchingGenes
 
-# TO-DO
 # Take in a population of unidentified species, and assign them to the proper species
 def speciate(population, generation, distanceThreshold, species):
-    newMembers = []
-    for individual in population:
-        candidates = []
-        assigned = False
-        for s in species:
-            delta = compatibilityDistance(individual, s.representative)
-            if  delta < distanceThreshold:
-                candidates.append((delta, s.ID))
-                assigned = True
+    while len(population) > 0:
+        individual = population[0]
+        species = identifySpecies(individual, species, generation, distanceThreshold)
+        population.pop(0)
 
-        if assigned == False:
-            newSpecies = NEAT_Classes.Species(generation)
-            newSpecies.update(individual, [individual])
-            species.append(newSpecies)
-            continue
+    return species
 
-        candidates.sort(key=lambda tup: tup[0])
-        closestSpecies = candidates[0][1]
-        newMembers.append((closestSpecies, individual))
+def identifySpecies(individual, species, generation, distanceThreshold):
+    candidates = []
+    assigned = False
+    for s in species:
+        delta = compatibilityDistance(individual, s.representative)
+        if  delta < distanceThreshold:
+            candidates.append((delta, s.ID))
+            assigned = True
 
-    for memberTuple in newMembers:
-        # Update the individual's species ID
-        memberTuple[1].species = memberTuple[0]
-        # Add individual to species members
-        species[memberTuple[0]].members[str(memberTuple[1].ID)] = copy.deepcopy(memberTuple[1])
+    if not assigned:
+        newSpecies = NEAT_Classes.Species(generation)
+        individual.species = newSpecies.ID
+        newSpecies.update(individual, [individual])
+        species.append(newSpecies)
+        return species
+
+    candidates.sort(key=lambda tup: tup[0])
+    closestSpecies = candidates[0][1]
+    individual.species = closestSpecies
+    species[closestSpecies].members[str(individual.ID)] = copy.deepcopy(individual)
 
     return species
 
@@ -155,22 +156,30 @@ def cullSpecies(species, maxPopSize):
                 largest = len(species[i].members)
                 index = i
 
-        neighborMeasures = []
-        for member1 in species[index].members.values():
-            proximities = 0
+        weakest = random.choice(species[index].members.values())
+        for member in species[index].members.values():
+            if member.fitness < weakest.fitness:
+                weakest = member
 
-            for member2 in species[index].members.values():
-                proximities += compatibilityDistance(member1, member2)
-            
-            neighborMeasures.append((proximities, member1))
-
-        neighborMeasures.sort(key=lambda tup: tup[0], reverse=True)
-
-        furthestMemberID = neighborMeasures[0][1].ID
-        species[index].members.pop(str(furthestMemberID))
+        species[index].members.pop(str(weakest.ID))
 
         totalMembers = 0
         for s in species:
             totalMembers += len(s.members)
 
+    return species
+
+def updateRepresentative(species, generation):
+    for s in species:
+        highestFitness = 0
+        challenger = None
+        
+        for member in s.members.values():
+            if member.fitness > highestFitness:
+                bestFitness = member.fitness
+                challenger = member
+        
+        if challenger.fitness >= s.representative.fitness:
+            s.lastImproved = generation
+            s.representative = copy.deepcopy(challenger)
     return species
