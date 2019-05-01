@@ -14,8 +14,8 @@ def create_graph(solution):
 
     # Iterate over nodes and instantiate their entries in the graph
     # Entry format is as follows: 'NodeID': (inputList, outputList)
-    for key, value in solution.nodes.items():
-        graph[str(value.ID)] = ([], [])
+    for node in solution.nodes:
+        graph[str(node.ID)] = ([], [])
 
     # Iterate over connections and add them to the graph entries 
     for key, value in solution.connections.items():
@@ -23,7 +23,7 @@ def create_graph(solution):
             graph[str(value.outNode)][0].append(str(value.inNode))
             graph[str(value.inNode)][1].append(str(value.outNode))
 
-    print(graph)
+    # print(graph)
 
     return graph
 
@@ -33,16 +33,20 @@ def compute_fitness(solution):
     # create shell command
     arg1 = sys.executable
     #arg2 = '/home/eam96/Documents/CSC790-AutoDNNConstruction/NEAT/fitness.py'
-    #arg2 = 'C:\\Users\\NathanLHall\\Desktop\\CSC 790 - Deep Learning\\CSC790-AutoDNNConstruction\\NEAT\\fitness.py'
-    arg2 = '/home/eam96/Desktop/CSC790-AutoDNNConstruction/NEAT/fitness.py'
+    arg2 = 'C:\\Users\\NathanLHall\\Desktop\\CSC 790 - Deep Learning\\CSC790-AutoDNNConstruction\\NEAT\\fitness.py'
+    # arg2 = '/home/eam96/Desktop/CSC790-AutoDNNConstruction/NEAT/fitness.py'
     arg3 = json.dumps(solution_graph)
     # run shell command
     p = Popen([arg1, arg2, arg3], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-    output, err = p.communicate() 
+    print("Before communicate")
+    output, err = p.communicate()
+    print("After communicate")
+    print()
+
     if len(err) != 0:
         print("Something went wrong")
         print(err)
         return -1.
 
+
     return float(output)
-    
