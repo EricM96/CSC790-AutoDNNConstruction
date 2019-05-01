@@ -10,7 +10,7 @@ import random
 
 genomeID = 1
 innovationCon = 0
-speciesID = 0
+speciesID = -1
 
 # Genome = Node Genes + Connections Genes
 class Genome:
