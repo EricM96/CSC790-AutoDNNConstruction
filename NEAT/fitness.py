@@ -154,6 +154,8 @@ class Solution(nn.Module):
                         else:
                             i += 1
 
+                visited_nodes.append(node)
+
             else:
                 hidden_keys.append(node)
 
