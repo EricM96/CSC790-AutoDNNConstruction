@@ -62,7 +62,7 @@ class Genome:
         print("FITNESS:", self.getFitness())
         print()
         print("NODE GENES:")
-        for node in sorted(self.getNodeGenes().sort(key=self.ID)):
+        for node in sorted(self.nodes, key=lambda _: self.ID):
             idNum = str(node.ID)
             if node.ID < 10:
                 idNum = " " + idNum

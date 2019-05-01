@@ -8,6 +8,7 @@ Created on Mon Mar 25 00:44:50 2019
 import NEAT_Classes
 
 import copy
+import random
 
 c1 = 1.0
 c2 = 1.0
@@ -156,7 +157,7 @@ def cullSpecies(species, maxPopSize):
                 largest = len(species[i].members)
                 index = i
 
-        weakest = random.choice(species[index].members.values())
+        weakest = random.choice(list(species[index].members.values()))
         for member in species[index].members.values():
             if member.fitness < weakest.fitness:
                 weakest = member
@@ -172,7 +173,7 @@ def cullSpecies(species, maxPopSize):
 def updateRepresentative(species, generation):
     for s in species:
         highestFitness = 0
-        challenger = None
+        challenger = random.choice(list(s.members.values()))
         
         for member in s.members.values():
             if member.fitness > highestFitness:

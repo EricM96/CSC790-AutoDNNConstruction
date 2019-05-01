@@ -41,15 +41,16 @@ def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
     population = initializePop(numInputs, numOutputs, popSize)
     for individual in population:
         individual.fitness = compute_fitness(individual)
-    
+
     species = NEAT_Speciation.species
 
     newSpecies = NEAT_Classes.Species(0)
     newSpecies.update(population[0], population)
     species.append(newSpecies)
 
-    # ? Measure fitness
     for generation in range(1, maxGenerations):
+        print("------------------------------")
+        print("Generation:", generation)
         offsprings = []
         for parent1 in population:
             parent2 = random.choice(population)
@@ -76,10 +77,8 @@ def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
         for s in species:
             for member in s.members.values():
                 population.append(member)
+        print()
         
-    #     print("Generation:", generation)
-
-
 if __name__ == "__main__":
     numInputs = 3
     numOutputs = 1
