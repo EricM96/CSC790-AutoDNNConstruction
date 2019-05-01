@@ -8,6 +8,7 @@ Created on Tue Mar 26 08:12:06 2019
 import NEAT_Classes
 import NEAT_Reproduction
 import NEAT_Speciation
+from utilities import compute_fitness
 
 # import numpy as np
 import random
@@ -24,7 +25,6 @@ def initializePop(numInputs, numOutputs, popSize):
     population = []
     for _ in range(popSize):
         individual = NEAT_Classes.Genome()
-        individual.species = 0
 
         for node in inputs:
             individual.addNodeGene(node)
@@ -35,21 +35,19 @@ def initializePop(numInputs, numOutputs, popSize):
 
         population.append(individual)
         
-    generation = 0
-    newSpecies = NEAT_Classes.Species(generation)
-    newSpecies.update(population[0], population)
-    
-    species = NEAT_Speciation.species
-    species.append(newSpecies)
-    # NEAT_Classes.genomeID = 1
-    # NEAT_Classes.innovationNod = 0
-    # NEAT_Classes.innovationCon = 0
-    # NEAT_Classes.speciesID = 0
-
-    return population, species
+    return population
 
 def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
-    population, species = initializePop(numInputs, numOutputs, popSize)
+    population = initializePop(numInputs, numOutputs, popSize)
+    for individual in population:
+        individual.fitness = compute_fitness(individual)
+    
+    species = NEAT_Speciation.species
+
+    newSpecies = NEAT_Classes.Species(0)
+    newSpecies.update(population[0], population)
+    species.append(newSpecies)
+
     # ? Measure fitness
     for generation in range(1, maxGenerations):
         offsprings = []
@@ -67,23 +65,25 @@ def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
             offsprings.append(offspring)
 
         # Measure offsprings fitnesses
+        for offspring in offsprings:
+            offspring.fitness = compute_fitness(offspring)
+
         species = NEAT_Speciation.speciate(offsprings, generation, distanceThreshold, species)
         species = NEAT_Speciation.cullSpecies(species, popSize)
+        species = NEAT_Speciation.updateRepresentative(species, generation)
+
+        population = []
+        for s in species:
+            for member in s.members.values():
+                population.append(member)
+        
     #     print("Generation:", generation)
-    # print(len(species))
-        # Update species representative (most fit? center most?)
-        # Cull species members
-        # Measure species fitnesses
 
-
-    # for offspring in offsprings:
-    #     offspring.displayConnectionGenes()
-    #print(len(offsprings))
 
 if __name__ == "__main__":
     numInputs = 3
     numOutputs = 1
     popSize = 10
-    maxGens = 10
+    maxGens = 30
     distanceThreshold = 3.0
     main(numInputs, numOutputs, popSize, maxGens, distanceThreshold)
