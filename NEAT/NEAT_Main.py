@@ -44,11 +44,11 @@ def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
     for individual in population:
         individual.fitness = compute_fitness(individual)
 
-    species = NEAT_Speciation.species
+    # species = NEAT_Speciation.species
 
-    newSpecies = NEAT_Classes.Species(0)
-    newSpecies.update(population[0], population)
-    species.append(newSpecies)
+    # newSpecies = NEAT_Classes.Species(0)
+    # newSpecies.update(population[0], population)
+    # species.append(newSpecies)
 
     for generation in range(1, maxGenerations):
         print("------------------------------")
@@ -61,8 +61,8 @@ def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
             while parent1 == parent2:
                 parent2 = random.choice(population)
             offspring = NEAT_Reproduction.crossover(parent1, parent2)
-            offspring = NEAT_Reproduction.addConnection(offspring)
             offspring = NEAT_Reproduction.addNode(offspring)
+            offspring = NEAT_Reproduction.addConnection(offspring)
             # offspring = NEAT_Reproduction.mutateWeights(offspring)
             offspring = NEAT_Reproduction.expressedMutation(offspring)
             offsprings.append(offspring)
