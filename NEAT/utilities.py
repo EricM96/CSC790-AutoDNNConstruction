@@ -23,12 +23,14 @@ def create_graph(solution):
             graph[str(value.outNode)][0].append(str(value.inNode))
             graph[str(value.inNode)][1].append(str(value.outNode))
 
-    # print(graph)
+    print(graph)
 
     return graph
 
 def compute_fitness(solution):
+    # solution.displayConnectionGenes()
     solution_graph = create_graph(solution)
+    # print()
 
     # create shell command
     arg1 = sys.executable
@@ -38,10 +40,7 @@ def compute_fitness(solution):
     arg3 = json.dumps(solution_graph)
     # run shell command
     p = Popen([arg1, arg2, arg3], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-    print("Before communicate")
     output, err = p.communicate()
-    print("After communicate")
-    print()
 
     if len(err) != 0:
         print("Something went wrong")
