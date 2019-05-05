@@ -61,13 +61,13 @@ class Genome:
         print("                  NETWORK GENOME                  ")
         print("FITNESS:", self.getFitness())
         print()
-        print("NODE GENES:")
-        for node in sorted(self.nodes, key=lambda _: self.ID):
-            idNum = str(node.ID)
-            if node.ID < 10:
-                idNum = " " + idNum
-            print(" ", idNum, "|", "Node", node.ID, "|", node.getType())
-        print()
+        # print("NODE GENES:")
+        # for node in sorted(self.nodes, key=lambda _: self.ID):
+        #     idNum = str(node.ID)
+        #     if node.ID < 10:
+        #         idNum = " " + idNum
+        #     print(" ", idNum, "|", "Node", node.ID, "|", node.getType())
+        # print()
 
         print("CONNECTION GENES:")
         for innovNum in sorted(self.getConnectionGenes().keys(), key=lambda s: int(s)):
@@ -138,10 +138,10 @@ class Species:
         self.adjusted_fitness = None
         self.fitness_history = []
 
-    def update(self, representative, members):
+    def update(self, representative, newMembers):
         self.representative = copy.deepcopy(representative)
-        for member in members:
-            self.members[str(copy.deepcopy(member.ID))] = copy.deepcopy(member)
+        for newMember in newMembers:
+            self.members[str(copy.deepcopy(newMember.ID))] = copy.deepcopy(newMember)
 
     def getFitnesses(self):
         return [member.fitness for member in self.members.values()]
