@@ -20,7 +20,9 @@ def initializePop(numInputs, numOutputs, popSize):
     connections = []
     for inNode in inputs:
         for outNode in outputs:
-            connections.append(NEAT_Classes.ConnectionGene(inNode.ID, outNode.ID, 1, True))
+            newConnection = NEAT_Classes.ConnectionGene(inNode.ID, outNode.ID, 1, True)
+            connections.append(newConnection)
+            NEAT_Reproduction.recordConnection(newConnection)
 
     population = []
     for _ in range(popSize):
@@ -65,24 +67,36 @@ def main(numInputs, numOutputs, popSize, maxGenerations, distanceThreshold):
             offspring = NEAT_Reproduction.expressedMutation(offspring)
             offsprings.append(offspring)
 
+        offsprings = NEAT_Reproduction.cleanConnections(offsprings)
+
         # Measure offsprings fitnesses
         for offspring in offsprings:
             offspring.fitness = compute_fitness(offspring)
 
-        species = NEAT_Speciation.speciate(offsprings, generation, distanceThreshold, species)
-        species = NEAT_Speciation.cullSpecies(species, popSize)
-        species = NEAT_Speciation.updateRepresentative(species, generation)
+        nextGeneration = []
+        while len(nextGeneration) < popSize:
+            individual = random.choice(population)
+            offspring = random.choice(offsprings)
+            if offspring.fitness >= individual.fitness:
+                nextGeneration.append(offspring)
+            else:
+                nextGeneration.append(individual)
+        
+        population = nextGeneration
 
-        population = []
-        for s in species:
-            for member in s.members.values():
-                population.append(member)
-        print()
+        # species = NEAT_Speciation.assignSpecies(offsprings, generation, distanceThreshold, species, popSize)
+        # species = NEAT_Speciation.cullSpecies(species, popSize)
+        # species = NEAT_Speciation.updateRepresentative(species, generation)
+
+        # population = []
+        # for s in species:
+            # for member in s.members.values():
+            #     population.append(member)
         
 if __name__ == "__main__":
     numInputs = 3
     numOutputs = 1
-    popSize = 10
+    popSize = 50
     maxGens = 30
     distanceThreshold = 3.0
     main(numInputs, numOutputs, popSize, maxGens, distanceThreshold)
