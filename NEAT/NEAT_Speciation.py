@@ -113,32 +113,33 @@ def compareGenes(genome1, genome2):
     return excessGenes, disjointGenes, weightDifference / matchingGenes
 
 # Take in a population of unidentified species, and assign them to the proper species
-def speciate(population, generation, distanceThreshold, species):
+def assignSpecies(population, generation, distanceThreshold, species, maxPopSize):
     while len(population) > 0:
         individual = population[0]
-        species = identifySpecies(individual, species, generation, distanceThreshold)
+        species = identifySpecies(individual, species, generation, distanceThreshold, maxPopSize)
         population.pop(0)
 
     return species
 
-def identifySpecies(individual, species, generation, distanceThreshold):
-    candidates = []
+def identifySpecies(individual, species, generation, distanceThreshold, maxPopSize):
+    minMemberSize = 5
+    deltaMeasurements = []
     assigned = False
     for s in species:
         delta = compatibilityDistance(individual, s.representative)
+        deltaMeasurements.append((delta, s.ID))
         if  delta < distanceThreshold:
-            candidates.append((delta, s.ID))
             assigned = True
 
-    if not assigned:
+    if not assigned and maxPopSize / len(species) > minMemberSize:
         newSpecies = NEAT_Classes.Species(generation)
         individual.species = newSpecies.ID
         newSpecies.update(individual, [individual])
         species.append(newSpecies)
         return species
 
-    candidates.sort(key=lambda tup: tup[0])
-    closestSpecies = candidates[0][1]
+    deltaMeasurements.sort(key=lambda tup: tup[0])
+    closestSpecies = deltaMeasurements[0][1]
     individual.species = closestSpecies
     species[closestSpecies].members[str(individual.ID)] = copy.deepcopy(individual)
 
@@ -173,6 +174,7 @@ def cullSpecies(species, maxPopSize):
 def updateRepresentative(species, generation):
     for s in species:
         highestFitness = 0
+        print(s.ID, len(s.members.values()))
         challenger = random.choice(list(s.members.values()))
         
         for member in s.members.values():
