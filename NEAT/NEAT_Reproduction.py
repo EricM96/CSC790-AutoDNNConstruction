@@ -6,9 +6,35 @@ Created on Sun Mar 24 14:38:16 2019
 """
 
 from NEAT_Classes import Genome, ConnectionGene, NodeGene
+import copy
 import random
 
 wMutStep = 2 # weight mutation step size
+connectionHistory = []
+
+def recordConnection(connection):
+    global connectionHistory
+    connectionHistory.append(connection)
+
+def checkConnectionHistory(nodePair):
+    global connectionHistory
+
+    minNode = None
+    maxNode = None
+    if nodePair[0].ID > nodePair[1].ID:
+        minNode = nodePair[1]
+        maxNode = nodePair[0]
+    elif nodePair[0].ID < nodePair[1].ID:
+        minNode = nodePair[0]
+        maxNode = nodePair[1]
+
+    exists = False
+    for connection in connectionHistory:
+        if connection.inNode == minNode.ID and connection.outNode == maxNode.ID:
+            exists = True
+            return exists, connection
+
+    return False, None
 
 def addConnection(individual):
     node1 = individual.getRandomNode()
@@ -30,6 +56,8 @@ def addConnection(individual):
         flipped = True
     elif node1.getType() == "OUTPUT" and node2.getType() == "INPUT":
         flipped = True
+    elif (node1.getType() == "HIDDEN" and node2.getType() == "HIDDEN") and (node1.getID() < node2.getID()):
+        flipped = True
 
     if flipped == False:
         inNode = node1
@@ -38,15 +66,23 @@ def addConnection(individual):
         inNode = node2
         outNode = node1
 
-    # Check if connection already exists
+    # Check if connection already exists within this NN, or it's reverse direction exists
     connectionExists = False
     for connection in individual.getConnectionGenes().values():
         if connection.getInNode() == inNode.getID() and connection.getOutNode() == outNode.getID():
             connectionExists = True
             break
 
+    global connectionHistory
+    if connectionExists == False:
+        exists, connection = checkConnectionHistory((node1, node2))
+        if exists:
+            individual.connections[str(copy.deepcopy(connection.getInnovation()))] = copy.deepcopy(connection)
+            return individual
+
     if connectionExists == False:
         individual.addConnectionGene(ConnectionGene(inNode.getID(), outNode.getID(), weight, True))
+        return individual
 
     return individual
 
@@ -123,6 +159,29 @@ def checkNumConnections(individual, connection):
         return "Safe"
     else:
         return "Unsafe"
+
+def purgeBadConnections(individual):
+    connectionList = []
+    for connection in individual.getConnectionGenes().values():
+        connectionList.append((connection.innovation, connection.inNode, connection.outNode))
+    
+    # Sort connections based on innovation number
+    connectionList = sorted(connectionList, key=lambda tup: tup[0])
+    # Iterate through all, except last, connections
+    for i in range(len(connectionList) - 1):
+        # Iterate through all following connections
+        for j in range(i + 1, len(connectionList)):
+            # If identical or reversed connection exists, delete it.
+            if (connectionList[i][1] == connectionList[j][1] and connectionList[i][2] == connectionList[j][2]) or (connectionList[i][1] == connectionList[j][2] and connectionList[i][2] == connectionList[j][1]):
+                del individual.connections[str(connectionList[j][0])]
+    
+    return individual
+
+def cleanConnections(population):
+    for individual in population:
+        individual = purgeBadConnections(individual)
+    
+    return population
 
 def crossover(parent1, parent2):
     child = Genome()
