@@ -8,6 +8,7 @@ Created on Mon Mar 25 00:44:50 2019
 import NEAT_Classes
 
 import copy
+import random
 
 c1 = 1.0
 c2 = 1.0
@@ -40,34 +41,42 @@ def compareGenes(genome1, genome2):
     disjointGenes = 0
     weightDifference = 0.0
 
-    maxNodeInnov1 = int(max(genome1.getNodeGenes().keys()))
-    maxNodeInnov2 = int(max(genome2.getNodeGenes().keys()))
+    nodes1 = genome1.getNodeGenes()
+    nodes2 = genome2.getNodeGenes()
+    maxNodeID1 = max(node.ID for node in nodes1)
+    maxNodeID2 = max(node.ID for node in nodes2)
+    maxNodeID = max([maxNodeID1, maxNodeID2])
 
-    if maxNodeInnov1 >= maxNodeInnov2:
-        maxNodeInnov = maxNodeInnov1
-    else:
-        maxNodeInnov = maxNodeInnov2
+    nodeIDs = []
+    for node in nodes1:
+        if node.ID not in nodeIDs:
+            nodeIDs.append(node.ID)
+    for node in nodes2:
+        if node.ID not in nodeIDs:
+            nodeIDs.append(node.ID)
 
-    for i in range(0, maxNodeInnov + 1):
+    for i in nodeIDs:
         node1 = None
         node2 = None
-
-        if str(i) in genome1.getNodeGenes().keys():
-            node1 = genome1.getNodeGenes()[str(i)]
-        if str(i) in genome2.getNodeGenes().keys():
-            node2 = genome2.getNodeGenes()[str(i)]
+        
+        for node in nodes1:
+            if i == node.ID:
+                node1 = node
+        for node in nodes2:
+            if i == node.ID:
+                node2 = node
 
         if node1 != None and node2 != None:
             matchingGenes += 1
 
-        elif node1 == None and maxNodeInnov1 < i and node2 != None:
+        elif node1 == None and maxNodeID1 < i and node2 != None:
             excessGenes += 1
-        elif node1 != None and maxNodeInnov2 < i and node2 == None:
+        elif node1 != None and maxNodeID2 < i and node2 == None:
             excessGenes += 1
 
-        elif node1 == None and maxNodeInnov1 > i and node2 != None:
+        elif node1 == None and maxNodeID1 > i and node2 != None:
             disjointGenes += 1
-        elif node1 != None and maxNodeInnov2 > i and node2 == None:
+        elif node1 != None and maxNodeID2 > i and node2 == None:
             disjointGenes += 1
 
     maxConnectionInnov1 = int(max(genome1.getConnectionGenes().keys()))
@@ -103,43 +112,77 @@ def compareGenes(genome1, genome2):
 
     return excessGenes, disjointGenes, weightDifference / matchingGenes
 
-# TO-DO
 # Take in a population of unidentified species, and assign them to the proper species
-def speciate(population, generation, distanceThreshold):
-    newMembers = []
-    for individual in population:
-        candidates = []
-        assigned = False
-        for s in species:
-            delta = compatibilityDistance(individual, s.representative)
-            if  delta < distanceThreshold:
-                candidates.append((delta, individual, s.ID))
-                assigned = True
-
-        if assigned == False:
-            newSpecies = NEAT_Classes.Species(generation)
-            newSpecies.update(individual, [individual])
-            species.append(newSpecies)
-        else:
-            candidates.sort(key=lambda tup: tup[0])
-            closestSpecies = candidates[0][2]
-            newMembers.append((closestSpecies, candidates[0][1]))
-
-    for memberTuple in newMembers:
-        species[memberTuple[0]].members[str(copy.deepcopy(memberTuple[1].ID))] = copy.deepcopy(memberTuple[1])
+def assignSpecies(population, generation, distanceThreshold, species, maxPopSize):
+    while len(population) > 0:
+        individual = population[0]
+        species = identifySpecies(individual, species, generation, distanceThreshold, maxPopSize)
+        population.pop(0)
 
     return species
 
-def cullSpecies(self):
+def identifySpecies(individual, species, generation, distanceThreshold, maxPopSize):
+    minMemberSize = 5
+    deltaMeasurements = []
+    assigned = False
     for s in species:
-        for member1 in s.members:
-            proximities = 0
-            neighborMeasures = []
+        delta = compatibilityDistance(individual, s.representative)
+        deltaMeasurements.append((delta, s.ID))
+        if  delta < distanceThreshold:
+            assigned = True
 
-            for member2 in s.members:
-                proximities += compatibilityDistance(member1, member2)
-            
-            neighborMeasures.append((proximities, member1))
-            neighborMeasures.sort(key=lambda tup: tup[0])
+    if not assigned and maxPopSize / len(species) > minMemberSize:
+        newSpecies = NEAT_Classes.Species(generation)
+        individual.species = newSpecies.ID
+        newSpecies.update(individual, [individual])
+        species.append(newSpecies)
+        return species
 
-            #for i in range(maxNumSpeciesMembers)
+    deltaMeasurements.sort(key=lambda tup: tup[0])
+    closestSpecies = deltaMeasurements[0][1]
+    individual.species = closestSpecies
+    species[closestSpecies].members[str(individual.ID)] = copy.deepcopy(individual)
+
+    return species
+
+def cullSpecies(species, maxPopSize):
+    totalMembers = 0
+    for s in species:
+        totalMembers += len(s.members)
+
+    while totalMembers > maxPopSize:
+        largest = 0
+        index = 0
+        for i in range(len(species)):
+            if len(species[i].members) > largest:
+                largest = len(species[i].members)
+                index = i
+
+        weakest = random.choice(list(species[index].members.values()))
+        for member in species[index].members.values():
+            if member.fitness < weakest.fitness:
+                weakest = member
+
+        species[index].members.pop(str(weakest.ID))
+
+        totalMembers = 0
+        for s in species:
+            totalMembers += len(s.members)
+
+    return species
+
+def updateRepresentative(species, generation):
+    for s in species:
+        highestFitness = 0
+        print(s.ID, len(s.members.values()))
+        challenger = random.choice(list(s.members.values()))
+        
+        for member in s.members.values():
+            if member.fitness > highestFitness:
+                bestFitness = member.fitness
+                challenger = member
+        
+        if challenger.fitness >= s.representative.fitness:
+            s.lastImproved = generation
+            s.representative = copy.deepcopy(challenger)
+    return species
