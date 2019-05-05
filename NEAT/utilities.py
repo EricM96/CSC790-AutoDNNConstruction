@@ -28,9 +28,7 @@ def create_graph(solution):
     return graph
 
 def compute_fitness(solution):
-    # solution.displayConnectionGenes()
     solution_graph = create_graph(solution)
-    # print()
 
     # create shell command
     arg1 = sys.executable
