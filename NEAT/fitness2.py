@@ -25,7 +25,7 @@ class Net(nn.Module):
 
 
 def main(genome):
-    use_gpu = True
+    use_gpu = False
     if use_gpu and torch.cuda.is_available():
         name = "Eric"
         device_num = 0 if ord(name[0]) % 2 == 0 else 1
@@ -69,7 +69,7 @@ def main(genome):
             loss = F.nll_loss(output, target)
             loss.backward()
             optimizer.step()
-            if batch_idx % 1000 == 0:
+            # if batch_idx % 1000 == 0:
                 # print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 #     epoch, batch_idx * len(data), len(train_loader.dataset),
                 #     100. * batch_idx / len(train_loader), loss.item()))
