@@ -1,5 +1,6 @@
 import copy
 import random
+from fitness2 import main
 from Reproduction_2 import crossover, addLayer, addNode
 from utilities import compute_fitness
 
