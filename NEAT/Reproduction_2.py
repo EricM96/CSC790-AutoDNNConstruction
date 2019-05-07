@@ -11,7 +11,7 @@ def addLayer(individual):
     if coinflip < adaptiveChance:
         cut = random.randint(1,len(individual.layers)-1)
         newLayer = individual.layers[:cut]
-        newLayer.append(2)
+        newLayer.append(5)
         for item in individual.layers[cut:]:
             newLayer.append(item)
         return newLayer
