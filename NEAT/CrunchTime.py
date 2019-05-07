@@ -1,5 +1,6 @@
 import copy
-from Reproduction_2 import crossover, addLayer
+import random
+from Reproduction_2 import crossover, addLayer, addNode
 from utilities import compute_fitness
 
 class NN:
@@ -13,7 +14,7 @@ def main(numInputs, numOutputs, popSize, maxGens):
         individual = NN([numInputs, numOutputs])
         population.append(individual)
     
-    initialFitness = = compute_fitness(population[0])
+    initialFitness == compute_fitness(population[0])
     for individual in population:
         individual.fitness = initialFitness
     
